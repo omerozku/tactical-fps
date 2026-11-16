@@ -1,47 +1,81 @@
-// Input controller for mouse look and keyboard movement
-export const input = {
-  keys: {},
-  mouse: { dx: 0, dy: 0, down: false, rightDown: false, clicked: false },
-  pointerLocked: false,
+export function createInput(canvas, onLockChange) {
+  const keys = Object.create(null);
+  const pressed = Object.create(null);
+  const mouse = { dx: 0, dy: 0, left: false, right: false, leftPressed: false, rightPressed: false, wheel: 0 };
+  const state = { locked: false, enabled: true };
 
-  init() {
-    window.addEventListener('keydown', (e) => {
-      this.keys[e.code] = true;
-    });
-    window.addEventListener('keyup', (e) => {
-      this.keys[e.code] = false;
-    });
+  const blockScroll = new Set(['Space', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ControlLeft', 'ControlRight']);
 
-    window.addEventListener('mousemove', (e) => {
-      if (this.pointerLocked) {
-        this.mouse.dx += e.movementX || e.mozMovementX || e.webkitMovementX || 0;
-        this.mouse.dy += e.movementY || e.mozMovementY || e.webkitMovementY || 0;
-      }
-    });
+  window.addEventListener('keydown', (event) => {
+    if (blockScroll.has(event.code)) event.preventDefault();
+    if (!keys[event.code]) pressed[event.code] = true;
+    keys[event.code] = true;
+  });
 
-    window.addEventListener('mousedown', (e) => {
-      if (e.button === 0) {
-        this.mouse.down = true;
-        this.mouse.clicked = true;
-      } else if (e.button === 2) {
-        this.mouse.rightDown = true;
-      }
-    });
+  window.addEventListener('keyup', (event) => {
+    keys[event.code] = false;
+  });
 
-    window.addEventListener('mouseup', (e) => {
-      if (e.button === 0) {
-        this.mouse.down = false;
-      } else if (e.button === 2) {
-        this.mouse.rightDown = false;
-      }
-    });
+  window.addEventListener('mousemove', (event) => {
+    if (!state.locked || !state.enabled) return;
+    mouse.dx += event.movementX || 0;
+    mouse.dy += event.movementY || 0;
+  });
 
-    window.addEventListener('contextmenu', (e) => e.preventDefault());
-  },
+  window.addEventListener('mousedown', (event) => {
+    if (!state.enabled) return;
+    if (event.button === 0) {
+      mouse.left = true;
+      mouse.leftPressed = true;
+    } else if (event.button === 2) {
+      mouse.right = true;
+      mouse.rightPressed = true;
+    }
+  });
 
-  clearFrame() {
-    this.mouse.dx = 0;
-    this.mouse.dy = 0;
-    this.mouse.clicked = false;
+  window.addEventListener('mouseup', (event) => {
+    if (event.button === 0) mouse.left = false;
+    if (event.button === 2) mouse.right = false;
+  });
+
+  window.addEventListener('wheel', (event) => {
+    mouse.wheel += Math.sign(event.deltaY);
+  }, { passive: true });
+
+  window.addEventListener('contextmenu', (event) => event.preventDefault());
+
+  document.addEventListener('pointerlockchange', () => {
+    state.locked = document.pointerLockElement === canvas;
+    if (onLockChange) onLockChange(state.locked);
+  });
+
+  function requestLock() {
+    if (canvas.requestPointerLock) {
+      const result = canvas.requestPointerLock();
+      if (result && typeof result.catch === 'function') result.catch(() => {});
+    }
   }
-};
+
+  function exitLock() {
+    if (document.pointerLockElement && document.exitPointerLock) document.exitPointerLock();
+  }
+
+  function consume(code) {
+    if (pressed[code]) {
+      pressed[code] = false;
+      return true;
+    }
+    return false;
+  }
+
+  function endFrame() {
+    mouse.dx = 0;
+    mouse.dy = 0;
+    mouse.leftPressed = false;
+    mouse.rightPressed = false;
+    mouse.wheel = 0;
+    for (const code in pressed) pressed[code] = false;
+  }
+
+  return { keys, pressed, mouse, state, requestLock, exitLock, consume, endFrame };
+}
