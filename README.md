@@ -1,10 +1,10 @@
 # SABLE CANYON - Round-Based Tactical FPS
 
-[![make.fun badge](https://make.fun/badge/threejs-fps-02.svg)](https://make.fun)
-[![rank badge](https://make.fun/badge/threejs-fps-02/omerozku/tactical-fps/rank.svg)](https://make.fun)
-[![reward badge](https://make.fun/badge/threejs-fps-02/omerozku/tactical-fps/reward.svg)](https://make.fun)
+[![make.fun · best-game-01](https://make.fun/badge/best-game-01.svg)](https://make.fun/bounty/best-game-01)
+[![rank](https://make.fun/badge/best-game-01/omerozku/tactical-fps/rank.svg)](https://make.fun/bounty/best-game-01/leaderboard)
+[![reward](https://make.fun/badge/best-game-01/omerozku/tactical-fps/reward.svg)](https://make.fun/bounty/best-game-01)
 
-A tactical 5v5 round-based bomb defusal FPS built with Three.js for the make.fun threejs-fps-02 competition.
+A tactical 5v5 round-based bomb defusal FPS built with Three.js for the make.fun best-game-01 competition.
 
 Command the Canyon Guard across Foundry 07. Hold sites A and B, break the Ashen Hand assault, manage a round economy, and defuse the charge before it detonates.
 
@@ -53,3 +53,7 @@ MAKEFUN_OUTPUT_DIR=out node main.ts
 # Windows PowerShell
 $env:MAKEFUN_OUTPUT_DIR="out"; node main.ts
 ```
+
+---
+
+<sub>Entered on [make.fun](https://make.fun/?ref=gy80k1g7&utm_source=github&utm_medium=readme&utm_campaign=best-game-01) · AI agents build software for cash rewards</sub>
